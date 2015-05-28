@@ -26,20 +26,8 @@
 
 	public class MirrorMain extends MovieClip
 	{
-
-		var now:Now = new Now();
-		var time:Date = new Date();
-		var scheduler:Scheduler = new Scheduler(now,this);
-		//var schedulerWidget:SchedulerWidget;
-		var shoutcastPlayer:ShoutcastPlayer = new ShoutcastPlayer();
-		var testArray:Array = new Array();
-		var weather:Weather = new Weather();
-		var newsfeed:Newsfeed = new Newsfeed();
-		var _rssLoader:URLLoader = new URLLoader();
-		var _rssURL:URLRequest = new URLRequest("http://derStandard.at/?page=rss&ressort=Seite1");
-
-		var refreshTimer = new Timer(50);
-		// Change this array to the pin configuration you use in your own setup.;
+		// Arduino object
+		var a:ArduinoWithServo;
 		var defaultPinConfig:Array = new Array(
 		null,// Pin 0   null (is RX)
 		null,// Pin 1   null (is TX)
@@ -61,11 +49,27 @@
 		'analogIn',   // Analog pin 3  analogIn
 		'analogIn',   // Analog pin 4  analogIn
 		'analogIn');
+		
+		
+		
+		var now:Now = new Now();
+		var time:Date = new Date();
+		var scheduler:Scheduler = new Scheduler(now,this);
+		//var schedulerWidget:SchedulerWidget;
+		var shoutcastPlayer:ShoutcastPlayer = new ShoutcastPlayer();
+		var testArray:Array = new Array();
+		var weather:Weather = new Weather();
+		var newsfeed:Newsfeed = new Newsfeed();
+		var _rssLoader:URLLoader = new URLLoader();
+		var _rssURL:URLRequest = new URLRequest("http://derStandard.at/?page=rss&ressort=Seite1");
 
-		// Arduino object
-		var a:ArduinoWithServo;
+		var refreshTimer = new Timer(50);
+		// Change this array to the pin configuration you use in your own setup.;
+		
 
-		//Jonas
+		
+
+		
 		var receivedValuesLeft:Array = new Array();
 		var receivedValuesRight:Array = new Array();
 		var receivedValuesBoth:Array = new Array();
@@ -84,9 +88,12 @@
 		var alphaThreshhold:int=0;	//For ball visibility
 		var menuInit:Boolean = false;
 		var menuActivated:Boolean = false;
+		
+		//TextFields
 		var textFieldLeft:TextField = new TextField(); //TODO ändern in textFieldMenuLeft
 		var textFieldRight:TextField = new TextField();
 		var textFieldMenuCenter:TextField = new TextField();
+		var textFieldScreensaver:TextField = new TextField();
 		
 		//Collision detection
 		var hitLeft:Boolean;
@@ -103,6 +110,8 @@
 		var hitCurrentlyDetected:Boolean =false;
 		
 		var swipeTriggerSensorValue:Number = 200; //TODO implement
+		
+		var magicMirrorOn:Boolean=false;
 
 
 
@@ -121,7 +130,9 @@
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE, timerStop);
 			// listen for firmware (sent on startup)
 			a.addEventListener(ArduinoEvent.FIRMWARE_VERSION, onReceiveFirmwareVersion);
-
+			
+			
+			
 			//stage.addChild(ball);
 			//stage.setChildIndex(ball, numChildren-1);  
 			
@@ -136,6 +147,8 @@
 			menuContainer.addChild(textFieldRight);
 			menuContainer.addChild(textFieldMenuCenter);
 			menuContainer.setChildIndex(ball, numChildren-1);  
+			
+			screensaver.addChild(textFieldScreensaver);
 			
 			ballTest.x=stage.width/2;
 			ballTest.y=stage.height/2;
@@ -172,11 +185,17 @@
 			textFieldMenuCenter.x=0-(textFieldMenuCenter.width/2);
 			textFieldMenuCenter.y= -50;
 			textFieldMenuCenter.textColor = 0xFFFFFF;
-			textFieldMenuCenter.text = "TEST TEST TEST";
+			
+			textFieldScreensaver.x=0-(textFieldScreensaver.width/2);
+			textFieldScreensaver.y=0;
+			textFieldScreensaver.textColor = 0xFFFFFF;
+			textFieldScreensaver.autoSize = "left";
+			textFieldScreensaver.multiline = true;
+			textFieldScreensaver.defaultTextFormat = new TextFormat('Verdana',16,0xDEDEDE);
+			textFieldScreensaver.text="Good morning, Beautiful!";
+			textFieldScreensaver.alpha=0;
 			
 			
-			
-
 		}
 		// == SETUP AND INITIALIZE CONNECTION ( don't modify ) ==================================
 
@@ -259,19 +278,53 @@
 			return Math.round(sum/arraySize);
 		}
 
+		function onScreensaverVisibleFinish(event:TweenEvent):void {
+			var tweenTxtScreensaverVisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,0,1,2,true);
+			tweenTxtScreensaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtVisibleFinalFinish);
+		}
+
+		function onTxtInvisibleFinish(event:TweenEvent):void {
+			var tweenScreenSaverInvisible:Tween = new Tween(screensaver,"alpha",Strong.easeInOut,1,0,3,true);
+		}
 		
+		function onTxtVisibleFinish(event:TweenEvent):void {
+			var tweenTxtScreensaverInvisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,1,0,2,true);
+			tweenTxtScreensaverInvisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtInvisibleFinish);
+		}
+		
+		function onTxtVisibleFinalFinish(event:TweenEvent):void {
+			var tweenTxtScreensaverInvisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,1,0,2,true);
+		}
 
 		function onTick(event:TimerEvent):void	
 		{
 			// calculate position
 			var valueLeft:Number;
 			var valueRight:Number;
+			var valueLight:Number;
 			var arrayLength = 15;  //TODO better outside of function
 
 			valueLeft = a.getAnalogData(3);
 			valueRight = a.getAnalogData(4);
+			valueLight = a.getAnalogData(5);
+			
 
-			//TODO just for testing purposes, has to be removed before
+			if (magicMirrorOn==false && valueLight<300) {
+				magicMirrorOn=true;
+				trace("MagicMirror turned on");
+				textFieldScreensaver.text="Good morning, Beautiful!";
+				var tweenTxtScreensaverVisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,0,1,2,true);
+				tweenTxtScreensaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtVisibleFinish);
+			}else if (magicMirrorOn==true && valueLight>590) {
+				magicMirrorOn=false;
+				trace("MagicMirror turned off");
+				textFieldScreensaver.text="Goodbye!";
+				var tweenScreenSaverVisible:Tween = new Tween(screensaver,"alpha",Strong.easeInOut,0,1,2,true);
+				tweenScreenSaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onScreensaverVisibleFinish);
+			}
+			
+			
+			
 						
 			if ((valueMean(receivedValuesRight) - valueMean(receivedValuesLeft))>(menuContainer.x-50-ballRight.width)) {
 				ball.x = menuContainer.x-50-ballRight.width;
@@ -294,7 +347,7 @@
 				receivedValuesRight.pop();
 			}
 
-			trace("Value left: ", valueLeft, "Value right: ", valueRight, " TextFieldCenterX ", textFieldMenuCenter.alpha," Player is on: ",playerIsOn, " menuActivated: ", menuActivated, " menuInit: ", menuInit);
+			trace("Value left: ", valueLeft, "Value right: ", valueRight, " ValueLight ", valueLight," Screensaver.alpha ", screensaver.alpha," Player is on: ",playerIsOn, " menuActivated: ", menuActivated, " menuInit: ", menuInit);
 
 			time = new Date();//WHAT FOR? ??
 
