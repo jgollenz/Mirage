@@ -282,7 +282,7 @@
 
 			addChild(_weatherToday);
 			_weatherToday.x = 100;
-			_weatherToday.y = 30;
+			_weatherToday.y = 40;
 
 
 			switch (day)

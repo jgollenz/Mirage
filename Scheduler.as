@@ -38,7 +38,7 @@
 		public function start():void
 		{
 			trace("NOW: "+now.year, now.month, now.dayOfMonth);
-			var patternRaw:RegExp = new RegExp("BEGIN.+\n.+\n.+\n.+(?="+"IMA2013"+").+\n.+\n.+(?=:):"+now.year+now.month+now.dayOfMonth+".*\n.+\n.+\n","g");
+			var patternRaw:RegExp = new RegExp("BEGIN.+\n.+\n.+\n.+(?="+"IMA2013"+").+\n.+\n.+(?=:):"+now.year+now.month+"0"+now.dayOfMonth+".*\n.+\n.+\n","g");
 			var patternLesson:RegExp = /.+(?=:):([^\\|\n]+)\\,\s([^\\]+)\\,\s(PR|VO|G1)[^:]+:(.+)[^:]+:(.+)\n[^:]+:(\w\.\w{2}\d{1,3}\.\w?\d{2,3})\s(\w{1,3}\d{2})/;
 			var patternUniqueID:RegExp = /UID:IMA2013_(\d+)/;
 

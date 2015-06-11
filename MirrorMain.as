@@ -59,6 +59,7 @@
 		var shoutcastPlayer:ShoutcastPlayer = new ShoutcastPlayer();
 		var testArray:Array = new Array();
 		var weather:Weather = new Weather();
+		var countdown:Countdowntimer = new Countdowntimer(); 
 		var newsfeed:Newsfeed = new Newsfeed();
 		var _rssLoader:URLLoader = new URLLoader();
 		var _rssURL:URLRequest = new URLRequest("http://derStandard.at/?page=rss&ressort=Seite1");
@@ -73,6 +74,7 @@
 		var receivedValuesLeft:Array = new Array();
 		var receivedValuesRight:Array = new Array();
 		var receivedValuesBoth:Array = new Array();
+
 		//var rightTriggeredLeftvalues:Array = new Array();
 		//var now:Date = new Date();
 		var timer:Timer = new Timer(800,1);		//Time in which the second value must be recognized to trigger a swipe
@@ -80,7 +82,16 @@
 		var fromDirection:String;
 		var currentlyDisplayed:String = "mainScreen";	//initial Screen displayed
 
-
+		var indicatorLeft:PageIndicator= new PageIndicator();
+		var indicatorMiddle:PageIndicator= new PageIndicator();
+		var indicatorRight:PageIndicator= new PageIndicator();
+		
+		var indicatorLeftInside:PageIndicatorInside= new PageIndicatorInside();
+		var indicatorMiddleInside:PageIndicatorInside= new PageIndicatorInside();
+		var indicatorRightInside:PageIndicatorInside= new PageIndicatorInside();
+		
+		
+		
 		var ball:Ball = new Ball();
 		var ballLeft = new Ball();
 		var ballRight = new Ball();
@@ -121,6 +132,7 @@
 			stage.addEventListener(Event.ENTER_FRAME, now.getTime);
 			refreshTimer.addEventListener(TimerEvent.TIMER, onTick);
 			weather.loadXML("http://weather.yahooapis.com/forecastrss?w=548536&u=c");
+			addEventListener(Event.ADDED_TO_STAGE, countdown.init);
 
 			a = new ArduinoWithServo("127.0.0.1",5331);
 			// listen for connection 
@@ -138,7 +150,14 @@
 			
 			mainScreen.addChild(now);
 			mainScreen.addChild(weather);
+			mainScreen.addChild(countdown); 
 			mainScreen.addChild(shoutcastPlayer);
+			menuContainer.addChild(indicatorLeft);
+			menuContainer.addChild(indicatorMiddle);
+			menuContainer.addChild(indicatorRight);
+			menuContainer.addChild(indicatorLeftInside);
+			menuContainer.addChild(indicatorMiddleInside);
+			menuContainer.addChild(indicatorRightInside);
 			menuContainer.addChild(ball);
 			menuContainer.addChild(ballLeft);
 			menuContainer.addChild(ballRight);
@@ -150,6 +169,8 @@
 			
 			screensaver.addChild(textFieldScreensaver);
 			
+			
+			//TODO gibts den noch? entfernen
 			ballTest.x=stage.width/2;
 			ballTest.y=stage.height/2;
 			
@@ -165,6 +186,25 @@
 			textFieldLeft.alpha=0;
 			textFieldRight.alpha=0;
 			textFieldMenuCenter.alpha=0;
+			
+			indicatorMiddle.x=0;//menuContainer.width/2-indicatorMiddle.width/2;
+			indicatorMiddle.y=170;
+			
+			indicatorMiddleInside.x=0;
+			indicatorMiddleInside.y=170;
+			indicatorMiddleInside.alpha=0;
+			
+			indicatorLeft.x=indicatorMiddle.x-45;
+			indicatorLeft.y=170;
+			
+			indicatorLeftInside.x=indicatorMiddle.x-45;
+			indicatorLeftInside.y=170;
+			
+			indicatorRight.x=indicatorMiddle.x+45;
+			indicatorRight.y=170;
+			
+			indicatorRightInside.x=indicatorMiddle.x+45;
+			indicatorRightInside.y=170;
 			
 			ball.y=0;
 			ballLeft.x=	50-menuContainer.x ;
@@ -669,12 +709,18 @@
 						var tweenContainerMainBackToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
 						var tweenContainerRightToLeft:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x - 900,1,true);
 						currentlyDisplayed="rightScreen";
+						indicatorRightInside.alpha=0;
+						indicatorMiddleInside.alpha=1;
+						indicatorLeftInside.alpha=1;
 						break;
 						
 						case "leftScreen":
 						var tweenContainerMainToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
 						var tweenContainerLeftToLeft:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x - 900,1,true);
 						currentlyDisplayed="mainScreen";
+						indicatorRightInside.alpha=1;
+						indicatorMiddleInside.alpha=0;
+						indicatorLeftInside.alpha=1;
 						break;
 						
 						case "rightScreen":
@@ -696,12 +742,18 @@
 							var tweenContainerMainBackToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
 							var tweenContainerLeftToRight:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x + 900,1,true);
 							currentlyDisplayed="leftScreen";
+							indicatorRightInside.alpha=1;
+							indicatorMiddleInside.alpha=1;
+							indicatorLeftInside.alpha=0;
 							break;
 							
 							case "rightScreen":
 							var tweenContainerMainToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
 							var tweenContainerRightToRight:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x + 900,1,true);
 							currentlyDisplayed="mainScreen";
+							indicatorRightInside.alpha=1;
+							indicatorMiddleInside.alpha=0;
+							indicatorLeftInside.alpha=1;
 							break;
 							
 							case "leftScreen":
