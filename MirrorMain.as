@@ -77,6 +77,7 @@
 		var playerIsOn:Boolean = false;
 		var volumeControl:Boolean = false;
 		var hitCurrentlyDetected:Boolean =false;
+		var countdownActivated:Boolean = false;
 
 		//Collision detection
 		var hitLeft:Boolean;
@@ -88,8 +89,8 @@
 		var menuStopSensorValueUpper:Number = 6;
 		var menuStopSensorValueLower:Number = 0;
 		var swipeTriggerSensorValue:Number = 200; //TODO implement
-		var lightSensorOnConstant:Number = 300; //The lower the brighter
-		var lightSensorOffConstant:Number = 590; //The higher the darker
+		var lightSensorOnConstant:Number = 550; //The lower the brighter
+		var lightSensorOffConstant:Number = 890; //The higher the darker
 		
 		
 		//Arrays for received Sensor-Data
@@ -98,9 +99,13 @@
 		var receivedValuesBoth:Array = new Array();
 		var startupCompliments:Array = new Array
 		(
-		"Good morning Beautiful", 
+		"Good morning Beautiful!", 
+		"Good morning Handsome!",
+		"You look gorgeous today ;)",
 		"You look awesome today ;)", 
-		"I hope your day is \n as nice as your butt!",
+		"How come you hair never looks bad?",
+		"Do you always look that\n good after you wake up?",
+		"Hi Beautiful!",
 		"Hi Handsome!",
 		"Good morning, I see the \n Assassins have failed"
 		);
@@ -112,6 +117,15 @@
 		"Opportunities are like sunrises. \n If you wait too long, you miss them. \n\n -William Arthur Ward",
 		"There is no snooze button on \n a cat who wants breakfast \n\n -Unknown"
 		);
+		var goodbyeCompliments:Array = new Array
+		(
+		 "I hope your day is \nas nice as your butt!",
+		 "Have a nice day!",
+		 "KEEP\nCALM\nAND\nHAVE A\nGOOD DAY!",
+		 "Goodbye!",
+		 "It's a good day\nto have a good day!",
+		 "You are amazing!\nGo out and show them"
+		 );
 
 		//TODO unbenennen in swipeTriggerTimer
 		var timer:Timer = new Timer(800,1);	//Time in which the second value must be recognized to trigger a swipe
@@ -178,7 +192,6 @@
 			menuContainer.addChild(ball);
 			menuContainer.addChild(ballLeft);
 			menuContainer.addChild(ballRight);
-			//menuContainer.addChild(ballTest);
 			menuContainer.addChild(countdown); 
 			menuContainer.addChild(textFieldLeft);
 			menuContainer.addChild(textFieldRight);
@@ -188,10 +201,6 @@
 			leftScreen.addChild(newsfeed);
 			rightScreen.addChild(scheduler);
 			
-			//TODO gibts den noch? entfernen
-			//ballTest.x=stage.width/2;
-			//ballTest.y=stage.height/2;
-			
 			_rssLoader.addEventListener(Event.COMPLETE, newsfeed.rssLoaded);
 			_rssLoader.load(_rssURL);
 
@@ -200,6 +209,8 @@
 			
 			//Inits for visible/invisible elements
 			
+			countdown.x=-300;
+			countdown.y=90;
 			countdown.alpha = 0;
 			
 			//balls
@@ -246,13 +257,17 @@
 			textFieldMenuCenter.textColor = 0xFFFFFF;
 			textFieldMenuCenter.alpha=0;
 			
-			textFieldScreensaver.x=0-(textFieldScreensaver.width/2);
-			textFieldScreensaver.y=0;
+			var formatScreensaverTF = new TextFormat();//'Orator Std',26,0xDEDEDE);
+			formatScreensaverTF.size= 26;
+			formatScreensaverTF.font="Orator Std";
+			formatScreensaverTF.color=0xDEDEDE; 
+			formatScreensaverTF.align = TextFormatAlign.CENTER;
+			
+			
 			textFieldScreensaver.textColor = 0xFFFFFF;
 			textFieldScreensaver.autoSize = "left";
 			textFieldScreensaver.multiline = true;
-			textFieldScreensaver.defaultTextFormat = new TextFormat('Verdana',16,0xDEDEDE);
-			textFieldScreensaver.text="Good morning, Beautiful!";
+			textFieldScreensaver.defaultTextFormat = formatScreensaverTF;
 			textFieldScreensaver.alpha=0;
 		}
 		
@@ -315,7 +330,9 @@
 			{
 				magicMirrorOn=true;
 				trace("MagicMirror turned on");
-				textFieldScreensaver.text=startupQuotes[randomRange(0,5)];
+				textFieldScreensaver.text=startupCompliments[randomRange(0,startupCompliments.length-1)];
+				textFieldScreensaver.x=0-(textFieldScreensaver.width/2);
+				textFieldScreensaver.y=0-(textFieldScreensaver.height/2);
 				var tweenTxtScreensaverVisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,0,1,2,true);
 				tweenTxtScreensaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtVisibleFinish);
 			}
@@ -323,7 +340,9 @@
 			{
 				magicMirrorOn=false;
 				trace("MagicMirror turned off");
-				textFieldScreensaver.text="Goodbye!";
+				textFieldScreensaver.text=goodbyeCompliments[randomRange(0,goodbyeCompliments.length-1)];
+				textFieldScreensaver.x=0-(textFieldScreensaver.width/2);
+				textFieldScreensaver.y=0-(textFieldScreensaver.height/2);
 				var tweenScreenSaverVisible:Tween = new Tween(screensaver,"alpha",Strong.easeInOut,0,1,2,true);
 				tweenScreenSaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onScreensaverVisibleFinish);
 			}
@@ -356,8 +375,9 @@
 			{
 				receivedValuesRight.pop();
 			}
-
-			trace("Value left: ", valueLeft, "Value right: ", valueRight, " ValueLight ", valueLight," Screensaver.alpha ", screensaver.alpha," Player is on: ",playerIsOn, " menuActivated: ", menuActivated, " menuInit: ", menuInit);
+			
+			//trace("Value left: ", valueLeft, "Value right: ", valueRight);
+			trace("Countdown X/Y", countdown.x,"/",countdown.y," Countdown.alpha ", countdown.alpha," Countdown is on: ",countdownActivated, " Countdown finished: ", countdown.getTimerHasFinished(), " Countdown current: ", countdown.getCurrentTime());
 
 			time = new Date();//WHAT FOR? ??
 
@@ -412,6 +432,15 @@
 				}
 			}
 			
+			if (countdownActivated==true && countdown.alpha<1) 
+			{
+				countdown.alpha+=0.05;
+			}
+			else if (countdown.getTimerHasFinished()==true && countdown.alpha>0)
+			{
+				countdown.alpha-=0.05;
+				countdownActivated=false;
+			}
 			
 			
 			hitLeft= ball.hitTestObject(ballLeft);
@@ -426,7 +455,12 @@
 					{
 						case "mainScreen":
 						trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed);
-						countdown.startTimer();
+						if (countdownActivated==false)
+						{
+							countdown.startTimer();
+							countdownActivated=true;
+						}
+						
 						break;
 						
 						case "leftScreen":
@@ -533,10 +567,10 @@
 														
 							textFieldLeft.alpha=textFieldLeft.alpha+0.1
 							textFieldRight.alpha = textFieldRight.alpha + 0.1
-							if (currentlyDisplayed == "mainScreen")// && countdown.alpha<1)
+							/*if (currentlyDisplayed == "mainScreen")// && countdown.alpha<1)
 							{
 								countdown.alpha += 0.1;
-							}			
+							}*/			
 						}
 						else 
 						{

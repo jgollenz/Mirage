@@ -10,7 +10,8 @@
 	import flash.text.AntiAliasType;
 	import fl.motion.Color;
 
-	public class Now extends Sprite //Umbenennen in Clock
+	//Umbenennen in Clock
+	public class Now extends Sprite
 	{
 		public var now:Date;
 		public var hours;
@@ -22,11 +23,17 @@
 		public var monthSpelled;
 		public var year;
 		public var dayOfMonth;
-		
+		public var fullDayOfMonth;
+
 		var champagne = new Champagne();
-		var textFormat:TextFormat = new TextFormat();
-		var textField:TextField = new TextField();
-		
+		var textFormatHoursAndMinutes:TextFormat = new TextFormat();
+		var textFormatSeconds:TextFormat = new TextFormat();
+		var textFormatWeekdayAndDate:TextFormat = new TextFormat();
+		var tfHoursAndMinutes:TextField = new TextField();
+		var tfSeconds:TextField = new TextField();
+		var tfWeekday:TextField = new TextField();
+		var tfDate:TextField = new TextField();
+
 
 		public function Now()
 		{
@@ -40,59 +47,141 @@
 
 			if (now.seconds > this.seconds)
 			{
-				if (now.hours < 10) {
+				if (now.hours < 10)
+				{
 					hours = "0" + now.hours;
-				}else{
+				}
+				else
+				{
 					hours = now.hours;
-				}if (now.minutes < 10){
+				}
+				if (now.minutes < 10)
+				{
 					minutes = "0" + now.minutes;
-				}else{
+				}
+				else
+				{
 					minutes = now.minutes;
-				}if (now.seconds < 10){
+				}
+				if (now.seconds < 10)
+				{
 					seconds = "0" + now.seconds;
-				}else{
+				}
+				else
+				{
 					seconds = now.seconds;
-				}if (now.day<10) {
-					day ="0"+now.day+1;
-				}else{
-					day = now.day+1;
-				}if (now.month<10) {
-					month=now.month+1;
-					month ="0"+month;
-				}else{
+				}
+				if (now.day < 10)
+				{
+					day = "0" + now.day + 1;
+				}
+				else
+				{
+					day = now.day + 1;
+				}
+				if (now.month < 10)
+				{
+					month = now.month + 1;
+					month = "0" + month;
+				}
+				else
+				{
 					month = now.month;
 				}
-				
+
 				switch (now.day)
 				{
-				case 1 :
-				daySpelled = "Monday";
-				break;
-				
-				case 2 :
-				daySpelled = "Tuesday";
-				break;
+					case 1 :
+						daySpelled = "Monday";
+						break;
 
-				case 3 :
-				daySpelled = "Wednesday";
-				break;
-				
-				case 4 :
-				daySpelled = "Friday";
-				break;
-				
-				case 5 :
-				daySpelled = "Saturday";
-				break;
-				
-				case 6 :
-				daySpelled = "Sunday";
-				break;
-				
+					case 2 :
+						daySpelled = "Tuesday";
+						break;
+
+					case 3 :
+						daySpelled = "Wednesday";
+						break;
+
+					case 4 :
+						daySpelled = "Thursday";
+						break;
+					
+					case 5 :
+						daySpelled = "Friday";
+						break;
+
+					case 6 :
+						daySpelled = "Saturday";
+						break;
+
+					case 7 :
+						daySpelled = "Sunday";
+						break;
 				}
 				
+				switch (now.month)
+				{
+					case 0 :
+						monthSpelled = "january";
+						break;
+					
+					case 1 :
+						monthSpelled = "february";
+						break;
+					
+					case 2 :
+						monthSpelled = "march";
+						break;
+					
+					case 3 :
+						monthSpelled = "april";
+						break;
+					
+					case 4 :
+						monthSpelled = "may";
+						break;
+					
+					case 5 :
+						monthSpelled = "june";
+						break;
+					
+					case 6 :
+						monthSpelled = "july";
+						break;
+					
+					case 7 :
+						monthSpelled = "august";
+						break;
+					
+					case 8 :
+						monthSpelled = "september";
+						break;
+					
+					case 9 :
+						monthSpelled = "october";
+						break;
+					
+					case 10 :
+						monthSpelled = "november";
+						break;
+					
+					case 11 :
+						monthSpelled = "december";
+						break;
+				}
+
 				year = now.fullYear;
 				dayOfMonth = now.date;
+				
+				if (dayOfMonth<10)
+				{
+					fullDayOfMonth="0"+dayOfMonth;
+				}
+				else
+				{
+					fullDayOfMonth=dayOfMonth;
+				}
 				/*
 				switch (dayOfMonth)
 				{
@@ -108,28 +197,35 @@
 				default :
 				dayOfMonth = dayOfMonth + "th of";
 				}*/
-
-
 				showTime();
 			}
-			
+
 			if (now.seconds < this.seconds)
 			{
-				if (now.seconds < 10){
+				if (now.seconds < 10)
+				{
 					seconds = "0" + now.seconds;
-				}else{
+				}
+				else
+				{
 					seconds = now.seconds;
-				}if (now.hours < 10){
+				}
+				if (now.hours < 10)
+				{
 					hours = "0" + now.hours;
-				}else{
+				}
+				else
+				{
 					hours = now.hours;
-				}if (now.minutes < 10){
+				}
+				if (now.minutes < 10)
+				{
 					minutes = "0" + now.minutes;
-				}else{
+				}
+				else
+				{
 					minutes = now.minutes;
 				}
-				
-				
 				showTime();
 			}
 			//var seconds:SecondsText = new SecondsText(minutes);
@@ -137,30 +233,67 @@
 			//trace (minutes,seconds);
 		}
 
-		
+
 		private function showTime()
 		{
-			textFormat.size = 17;
-			textFormat.align = TextFormatAlign.CENTER;
-			textFormat.font = champagne.fontName;
+			textFormatHoursAndMinutes.size = 57;
+			textFormatHoursAndMinutes.align = TextFormatAlign.CENTER;
+			textFormatHoursAndMinutes.font = "Orator Std";
+			textFormatHoursAndMinutes.color = "0xFFFFFF";
+
+			textFormatSeconds.size = 17;
+			textFormatSeconds.align = TextFormatAlign.CENTER;
+			textFormatSeconds.font = "Orator Std";
+			textFormatSeconds.color = "0xFFFFFF";
+
+			textFormatWeekdayAndDate.size = 35;
+			textFormatWeekdayAndDate.align = TextFormatAlign.CENTER;
+			textFormatWeekdayAndDate.font = "Segoe UI";
+			textFormatWeekdayAndDate.color = "0xFFFFFF";
 			
-			textField.defaultTextFormat = textFormat;
-			textField.embedFonts = true;
-			textField.antiAliasType = AntiAliasType.ADVANCED;
+			;
+			tfHoursAndMinutes.defaultTextFormat = textFormatHoursAndMinutes;
+			//tfHoursAndMinutes.embedFonts = true;
+			//tfHoursAndMinutes.antiAliasType = AntiAliasType.ADVANCED;
 			trace(now.hours,now.minutes,now.seconds);
-			textField.text = this.hours + ":" + this.minutes + ":" + this.seconds+ " - " + this.dayOfMonth+"-"+this.month+"-"+this.year;
-			textField.text = this.daySpelled +", "+this.dayOfMonth+"."+this.month+"."+this.year+"\n"+this.hours + ":" + this.minutes + ":" + this.seconds;
-			textField.textColor = 0xFFFFFF;
-			textField.x = 280;
-			textField.y = 70;
-			textField.width = 300;
-			textField.border = true;
-			//textField.borderColor
-			addChild(textField);
+			tfHoursAndMinutes.text = this.hours + ":" + this.minutes;
+			//tfHoursAndMinutes.textColor = 0xFFFFFF;
+			tfHoursAndMinutes.x = 300;
+			tfHoursAndMinutes.y = 40;
+			tfHoursAndMinutes.autoSize = "left";
+			tfHoursAndMinutes.multiline = true;
+			//tfHoursAndMinutes.width = 300;
+			tfHoursAndMinutes.border = true;
+
+			tfSeconds.defaultTextFormat = textFormatSeconds;
+			tfSeconds.text = this.seconds;
+			tfSeconds.x = tfHoursAndMinutes.x + tfHoursAndMinutes.width;
+			tfSeconds.y = tfHoursAndMinutes.y + 15;
+			tfSeconds.autoSize = "left";
+			tfSeconds.multiline = true;
+
+			tfWeekday.defaultTextFormat = textFormatWeekdayAndDate;
+			tfWeekday.text = this.daySpelled+" "+this.day;// +" "+ this.monthSpelled;
+			tfWeekday.autoSize = "left";
+			tfWeekday.multiline = true;
+			tfWeekday.x = tfHoursAndMinutes.x;
+			tfWeekday.y = tfHoursAndMinutes.y + tfHoursAndMinutes.height + 5;
+
+			tfDate.defaultTextFormat = textFormatWeekdayAndDate;
+			tfDate.text = this.dayOfMonth + ". " + this.monthSpelled + " " + this.year;
+			tfDate.autoSize = "left";
+			tfDate.multiline = true;
+			tfDate.x = tfHoursAndMinutes.x;
+			tfDate.y = tfWeekday.y + tfWeekday.height + 5;
+
+			//tfHoursAndMinutes.text = this.daySpelled +", "+this.dayOfMonth+"."+this.month+"."+this.year+"\n"+this.hours + ":" + this.minutes + ":" + this.seconds;
+
+			addChild(tfHoursAndMinutes);
+			addChild(tfSeconds);
+			addChild(tfWeekday);
+			addChild(tfDate);
 		}
-
 	}
-
 }
 
 

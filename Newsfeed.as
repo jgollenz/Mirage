@@ -152,11 +152,6 @@
 			addChild(description00);
 			addChild(description01);
 			addChild(description02);
-
-
 		}
-
-
-
 	}
 }
