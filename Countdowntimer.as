@@ -25,7 +25,7 @@
 		private var textFormat:TextFormat = new TextFormat();
 		private var textHeadline:TextFormat = new TextFormat();
 		private var champagne = new Champagne();
-		
+
 		public function Countdowntimer():void
 		{
 			addEventListener(Event.ADDED_TO_STAGE, init);
@@ -35,55 +35,52 @@
 		{
 			_repeatCount = _totalMinutes * 60;
 			_timer = new Timer(1000,_repeatCount);
-			_timer.addEventListener(TimerEvent.TIMER, _OnTimerFired);			
+			_timer.addEventListener(TimerEvent.TIMER, _OnTimerFired);
 		}
-		
-		public function startTimer():void {
-			timerHasFinished=false;
+
+		public function startTimer():void
+		{
+			timerHasFinished = false;
 			_timer.start();
 		}
-		
-		public function getTimerHasFinished():Boolean 
+
+		public function getTimerHasFinished():Boolean
 		{
 			return timerHasFinished;
 		}
-		
-		public function getCurrentTime():String 
+
+		public function getCurrentTime():String
 		{
 			return minutes.text+":"+seconds.text;
 		}
-		
+
 		private function _OnTimerFired(e:TimerEvent):void
 		{
-			textFormat.size = 40;
-			textFormat.font = "Orator Std";//
-			//textFormat.font = champagne.fontName;
+			textFormat.size = 50;
+			textFormat.font = "Orator Std";
 			textFormat.color = 0xFFFFFF;
 
-			textHeadline.size = 17;
-			//textHeadline.font = "Orator Std";//champagne.fontName;
+			textHeadline.size = 30;
+			textHeadline.font = "Orator Std";
 			textFormat.font = champagne.fontName;
 			textHeadline.color = 0xFFFFFF;
 
 			headline.defaultTextFormat = textHeadline;
 			headline.text = "Countdown Timer";
-			headline.embedFonts = true;
 			headline.antiAliasType = AntiAliasType.ADVANCED;
-			headline.x = 0;
-			headline.y = 0;
+			headline.x = -120;
+			headline.y = -10;
 			headline.width = 500;
 
 			minutes.defaultTextFormat = textFormat;
-			minutes.embedFonts = true;
 			minutes.antiAliasType = AntiAliasType.ADVANCED;
-			minutes.x = 10;
+			minutes.x = -120;
 			minutes.y = 30;
 			minutes.width = 100;
 
 			seconds.defaultTextFormat = textFormat;
-			seconds.embedFonts = true;
 			seconds.antiAliasType = AntiAliasType.ADVANCED;
-			seconds.x = 75;
+			seconds.x = -20;
 			seconds.y = 30;
 			seconds.width = 100;
 
@@ -100,15 +97,15 @@
 			{
 				seconds.text = secRem.toString();
 			}
-			
-			if (minutes.text=="00 : " && seconds.text=="00") 
+
+			if (minutes.text == "00 : " && seconds.text == "00")
 			{
-				timerHasFinished=true;
+				timerHasFinished = true;
 			}
 
 			this.addChild(headline);
 			this.addChild(minutes);
-			this.addChild(seconds); 
+			this.addChild(seconds);
 		}
 	}
 }

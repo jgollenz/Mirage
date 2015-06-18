@@ -81,14 +81,14 @@
 			var _weatherToday:MovieClip = new MovieClip();
 
 			
-			var sizeOfNextDays:Number = 10;		//How large the next days are displayed
+			var sizeOfNextDays:Number = 14;		//How large the next days are displayed
 			
-			var widthNextDays:Number = 50;			//width of the NextDay TextFields
-			var widthNextDaysMinMax:Number = 30;	//width of the NextDayMin and NextDayMax TextFields
+			var widthNextDays:Number = 100;			//width of the NextDay TextFields
+			var widthNextDaysMinMax:Number = 50;	//width of the NextDayMin and NextDayMax TextFields
 			
 			var xNextDays:Number = 10;		//First column ... which day
-			var xNextDaysMin:Number = 70;	//Second column ... min degrees
-			var xNextDaysMax:Number = 105;	//Third column ... max degrees
+			var xNextDaysMin:Number = 100;	//Second column ... min degrees
+			var xNextDaysMax:Number = 155;	//Third column ... max degrees
 			
 			var yNextDay1:Number = 220;		//First row	... first day
 			var yNextDay2:Number = 240;		//Second row ... second day
@@ -96,71 +96,63 @@
 			var yNextDay4:Number=280;		//Fourth row ... fourth day
 
 			textFormat.size = sizeOfNextDays;
-			textFormat.font = champagne.fontName;
-			textFormat.color = 0xFFFFFF;
+			textFormat.font = "Orator Std";
+			textFormat.color = "0xFFFFFF";
 
-			textHeadline.size = 35;
-			textHeadline.font = champagne.fontName;
-			textHeadline.color = 0xFFFFFF;
+			textHeadline.size = 40;
+			textHeadline.font = "Orator Std";
+			textHeadline.color = "0xFFFFFF";
 
-			textToday.size = 17;
-			textToday.font = champagne.fontName;
-			textToday.color = 0xFFFFFF;
+			textToday.size = 20;
+			textToday.font = "Orator Std";
+			textToday.color = "0xFFFFFF"
 
 
 			state.defaultTextFormat = textHeadline;
-			state.embedFonts = true;
 			state.antiAliasType = AntiAliasType.ADVANCED;
 			state.x = 10;
-			state.y = 70;
+			state.y = 30;
 			state.width = 175;
 
 			text.defaultTextFormat = textToday;
-			text.embedFonts = true;
 			text.antiAliasType = AntiAliasType.ADVANCED;
 			text.x = 80;
-			text.y = 120;
+			text.y = 90;
 			text.width = 355;
 
 			temp.defaultTextFormat = textToday;
-			temp.embedFonts = true;
 			temp.antiAliasType = AntiAliasType.ADVANCED;
 			temp.x = 10;
-			temp.y = 120;
+			temp.y = 90;
 			temp.width = 120;
 
 			minText.defaultTextFormat = textToday;
-			minText.embedFonts = true;
 			minText.antiAliasType = AntiAliasType.ADVANCED;
 			minText.x = 10;
-			minText.y = 150;
+			minText.y = 130;
 			minText.width = 50;
 			minText.text = "Min:";
 
 			min.defaultTextFormat = textToday;
-			min.embedFonts = true;
 			min.antiAliasType = AntiAliasType.ADVANCED;
-			min.x = 50;
-			min.y = 150;
+			min.x = 70;
+			min.y = 130;
 			min.width = 80;
 
 			maxText.defaultTextFormat = textToday;
-			maxText.embedFonts = true;
 			maxText.antiAliasType = AntiAliasType.ADVANCED;
 			maxText.x = 10;
-			maxText.y = 180;
+			maxText.y = 160;
 			maxText.width = 50;
 			maxText.text = "Max:";
 
 			max.defaultTextFormat = textToday;
-			max.embedFonts = true;
 			max.antiAliasType = AntiAliasType.ADVANCED;
-			max.x = 50;
-			max.y = 180;
+			max.x = 70;
+			max.y = 160;
 			max.width = 80;
 
 			day1.defaultTextFormat = textFormat;
-			day1.embedFonts = true;
 			day1.antiAliasType = AntiAliasType.ADVANCED;
 			day1.x = xNextDays;
 			day1.y = yNextDay1;
@@ -168,77 +160,66 @@
 
 
 			day2.defaultTextFormat = textFormat;
-			day2.embedFonts = true;
 			day2.antiAliasType = AntiAliasType.ADVANCED;
 			day2.x = xNextDays;
 			day2.y = yNextDay2;
 			day2.width = widthNextDays;
 
 			day3.defaultTextFormat = textFormat;
-			day3.embedFonts = true;
 			day3.antiAliasType = AntiAliasType.ADVANCED;
 			day3.x = xNextDays;
 			day3.y = yNextDay3;
 			day3.width = widthNextDays;
 
 			day4.defaultTextFormat = textFormat;
-			day4.embedFonts = true;
 			day4.antiAliasType = AntiAliasType.ADVANCED;
 			day4.x = xNextDays;
 			day4.y = yNextDay4;
 			day4.width = widthNextDays;
 
 			day1min.defaultTextFormat = textFormat;
-			day1min.embedFonts = true;
 			day1min.antiAliasType = AntiAliasType.ADVANCED;
 			day1min.x = xNextDaysMin;
 			day1min.y = yNextDay1;
 			day1min.width = widthNextDaysMinMax;
 
 			day1max.defaultTextFormat = textFormat;
-			day1max.embedFonts = true;
 			day1max.antiAliasType = AntiAliasType.ADVANCED;
 			day1max.x = xNextDaysMax;
 			day1max.y = yNextDay1;
 			day1max.width = widthNextDaysMinMax;
 
 			day2min.defaultTextFormat = textFormat;
-			day2min.embedFonts = true;
 			day2min.antiAliasType = AntiAliasType.ADVANCED;
 			day2min.x = xNextDaysMin;
 			day2min.y = yNextDay2;
 			day2min.width = widthNextDaysMinMax;
 
 			day2max.defaultTextFormat = textFormat;
-			day2max.embedFonts = true;
 			day2max.antiAliasType = AntiAliasType.ADVANCED;
 			day2max.x = xNextDaysMax;
 			day2max.y = yNextDay2;
 			day2max.width = widthNextDaysMinMax;
 
 			day3min.defaultTextFormat = textFormat;
-			day3min.embedFonts = true;
 			day3min.antiAliasType = AntiAliasType.ADVANCED;
 			day3min.x = xNextDaysMin;
 			day3min.y = yNextDay3;
 			day3min.width = widthNextDaysMinMax;
 
 			day3max.defaultTextFormat = textFormat;
-			day3max.embedFonts = true;
 			day3max.antiAliasType = AntiAliasType.ADVANCED;
 			day3max.x = xNextDaysMax;
 			day3max.y = yNextDay3;
 			day3max.width = widthNextDaysMinMax;
 
 			day4min.defaultTextFormat = textFormat;
-			day4min.embedFonts = true;
 			day4min.antiAliasType = AntiAliasType.ADVANCED;
 			day4min.x = xNextDaysMin;
 			day4min.y = yNextDay4;
 			day4min.width = widthNextDaysMinMax;
 
 			day4max.defaultTextFormat = textFormat;
-			day4max.embedFonts = true;
 			day4max.antiAliasType = AntiAliasType.ADVANCED;
 			day4max.x = xNextDaysMax;
 			day4max.y = yNextDay4;
@@ -281,8 +262,8 @@
 			addChild(day4max);
 
 			addChild(_weatherToday);
-			_weatherToday.x = 100;
-			_weatherToday.y = 40;
+			_weatherToday.x = 130;
+			_weatherToday.y = 10;
 
 
 			switch (day)

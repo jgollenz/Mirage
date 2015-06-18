@@ -50,16 +50,16 @@
 		'analogIn',   // Analog pin 4  analogIn
 		'analogIn'
 		);
-		
-		
-		
+
+
+
 		var now:Now = new Now();
 		var time:Date = new Date();
 		var scheduler:Scheduler = new Scheduler(now,this);
 		//var schedulerWidget:SchedulerWidget;
 		var shoutcastPlayer:ShoutcastPlayer = new ShoutcastPlayer();
 		var weather:Weather = new Weather();
-		var countdown:Countdowntimer = new Countdowntimer(); 
+		var countdown:Countdowntimer = new Countdowntimer();
 		var newsfeed:Newsfeed = new Newsfeed();
 		var _rssLoader:URLLoader = new URLLoader();
 		var _rssURL:URLRequest = new URLRequest("http://derStandard.at/?page=rss&ressort=Seite1");
@@ -69,30 +69,31 @@
 		Adjust for more granularity concerning received Sensor-Data*/
 		var refreshTimer = new Timer(50);
 		// Change this array to the pin configuration you use in your own setup.;
-		
+
 		//Init booleans
-		var magicMirrorOn:Boolean=false;
+		var magicMirrorOn:Boolean = false;
 		var menuInit:Boolean = false;
 		var menuActivated:Boolean = false;
 		var playerIsOn:Boolean = false;
 		var volumeControl:Boolean = false;
-		var hitCurrentlyDetected:Boolean =false;
+		var hitCurrentlyDetected:Boolean = false;
 		var countdownActivated:Boolean = false;
+		var readingArticle = false;
 
 		//Collision detection
 		var hitLeft:Boolean;
 		var hitRight:Boolean;
-		
+
 		//Sensor-Value Boundaries
-		var menuStartSensorValueUpper:Number = 170;	//TODO verifiy if correct
+		var menuStartSensorValueUpper:Number = 170;//TODO verifiy if correct
 		var menuStartSensorValueLower:Number = 110;
 		var menuStopSensorValueUpper:Number = 6;
 		var menuStopSensorValueLower:Number = 0;
-		var swipeTriggerSensorValue:Number = 200; //TODO implement
-		var lightSensorOnConstant:Number = 550; //The lower the brighter
-		var lightSensorOffConstant:Number = 890; //The higher the darker
-		
-		
+		var swipeTriggerSensorValue:Number = 220;//TODO implement
+		var lightSensorOnConstant:Number = 550;//The lower the brighter
+		var lightSensorOffConstant:Number = 890;//The higher the darker
+
+
 		//Arrays for received Sensor-Data
 		var receivedValuesLeft:Array = new Array();
 		var receivedValuesRight:Array = new Array();
@@ -101,6 +102,7 @@
 		(
 		"Good morning Beautiful!", 
 		"Good morning Handsome!",
+		"My dear, you are the \nfairest in the land",
 		"You look gorgeous today ;)",
 		"You look awesome today ;)", 
 		"How come you hair never looks bad?",
@@ -128,39 +130,40 @@
 		 );
 
 		//TODO unbenennen in swipeTriggerTimer
-		var timer:Timer = new Timer(800,1);	//Time in which the second value must be recognized to trigger a swipe
+		var timer:Timer = new Timer(800,1);//Time in which the second value must be recognized to trigger a swipe
 		var holdDownTimer:Number = 0;
-		var holdDownValue:Number = 15; //TODO really 15? IMPLEMENT!
+		var holdDownValue:Number = 15;//TODO really 15? IMPLEMENT!
 		var fromDirection:String;
-		var currentlyDisplayed:String = "mainScreen";	//initial Screen displayed
+		var currentlyDisplayed:String = "mainScreen";//initial Screen displayed
 
-		//Page indicators		
+		//Page indicators
 		var indicatorLeft:PageIndicator= new PageIndicator();
 		var indicatorMiddle:PageIndicator= new PageIndicator();
 		var indicatorRight:PageIndicator= new PageIndicator();
-		
+
 		var indicatorLeftInside:PageIndicatorInside= new PageIndicatorInside();
 		var indicatorMiddleInside:PageIndicatorInside= new PageIndicatorInside();
 		var indicatorRightInside:PageIndicatorInside= new PageIndicatorInside();
-		
-		//Balls for menu UI		
+
+		//Balls for menu UI
 		var ball:Ball = new Ball();
 		var ballLeft = new Ball();
 		var ballRight = new Ball();
 		//var ballTest = new Ball();
-		var alphaThreshhold:int=0;	//For ball visibility
-		
-		
+		var alphaThreshhold:int = 0;//For ball visibility
+
+
 		//TextFields
-		var textFieldLeft:TextField = new TextField(); //TODO ändern in textFieldMenuLeft
+		var textFieldLeft:TextField = new TextField();//TODO ändern in textFieldMenuLeft
 		var textFieldRight:TextField = new TextField();
 		var textFieldMenuCenter:TextField = new TextField();
 		var textFieldScreensaver:TextField = new TextField();
-		
-		
-		
-		
-		
+		var textFieldArticle:TextField = new TextField();
+
+		var textStart:TextFormat = new TextFormat();
+		var textBall:TextFormat = new TextFormat();
+
+
 		public function MirrorMain()
 		{
 			// Refresh the clock
@@ -177,11 +180,11 @@
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE, timerStop);
 			// listen for firmware (sent on startup)
 			a.addEventListener(ArduinoEvent.FIRMWARE_VERSION, onReceiveFirmwareVersion);
-			
-			//Adding stuff to the stage (or the containers)			
+
+			//Adding stuff to the stage (or the containers)
 			mainScreen.addChild(now);
 			mainScreen.addChild(weather);
-			//mainScreen.addChild(countdown); 
+			//mainScreen.addChild(countdown); ;
 			mainScreen.addChild(shoutcastPlayer);
 			menuContainer.addChild(indicatorLeft);
 			menuContainer.addChild(indicatorMiddle);
@@ -192,87 +195,104 @@
 			menuContainer.addChild(ball);
 			menuContainer.addChild(ballLeft);
 			menuContainer.addChild(ballRight);
-			menuContainer.addChild(countdown); 
+			menuContainer.addChild(countdown);
 			menuContainer.addChild(textFieldLeft);
 			menuContainer.addChild(textFieldRight);
 			menuContainer.addChild(textFieldMenuCenter);
-			menuContainer.setChildIndex(ball, numChildren-1);  
+			menuContainer.setChildIndex(ball, numChildren-1);
 			screensaver.addChild(textFieldScreensaver);
 			leftScreen.addChild(newsfeed);
+			leftScreen.addChild(textFieldArticle);
 			rightScreen.addChild(scheduler);
-			
+
 			_rssLoader.addEventListener(Event.COMPLETE, newsfeed.rssLoaded);
 			_rssLoader.load(_rssURL);
 
-			
+
 			scheduler.Controller();
-			
-			//Inits for visible/invisible elements
-			
-			countdown.x=-300;
-			countdown.y=90;
+
+			//Inits for visible/invisible elements;
+
+			countdown.x = -300;
+			countdown.y = 90;
 			countdown.alpha = 0;
-			
+
 			//balls
-			ball.y=0;
-			ball.alpha=0;
-			
-			ballLeft.x=	50-menuContainer.x ;
+			ball.y = 0;
+			ball.alpha = 0;
+
+			ballLeft.x = 50 - menuContainer.x;
 			ballLeft.y = 0;
-			ballLeft.alpha=0;
-			
-			ballRight.x=menuContainer.x-50;
-			ballRight.y =  0;
-			ballRight.alpha=0;
-						
-			indicatorMiddle.x=0;
-			indicatorMiddle.y=170;
-			indicatorMiddleInside.x=0;
-			indicatorMiddleInside.y=170;
-			indicatorMiddleInside.alpha=0;
-			
-			indicatorLeft.x=indicatorMiddle.x-45;
-			indicatorLeft.y=170;
-			indicatorLeftInside.x=indicatorMiddle.x-45;
-			indicatorLeftInside.y=170;
-			indicatorRight.x=indicatorMiddle.x+45;
-			indicatorRight.y=170;
-			
-			indicatorRightInside.x=indicatorMiddle.x+45;
-			indicatorRightInside.y=170;
-			
+			ballLeft.alpha = 0;
+
+			ballRight.x = menuContainer.x - 50;
+			ballRight.y = 0;
+			ballRight.alpha = 0;
+
+			indicatorMiddle.x = 0;
+			indicatorMiddle.y = 170;
+			indicatorMiddleInside.x = 0;
+			indicatorMiddleInside.y = 170;
+			indicatorMiddleInside.alpha = 0;
+
+			indicatorLeft.x = indicatorMiddle.x - 45;
+			indicatorLeft.y = 170;
+			indicatorLeftInside.x = indicatorMiddle.x - 45;
+			indicatorLeftInside.y = 170;
+			indicatorRight.x = indicatorMiddle.x + 45;
+			indicatorRight.y = 170;
+
+			indicatorRightInside.x = indicatorMiddle.x + 45;
+			indicatorRightInside.y = 170;
+
 			//TextFields
-			textFieldLeft.x=ballLeft.x-(textFieldLeft.width/4);
-			textFieldLeft.y=40;
+			textFieldLeft.x=ballLeft.x-(textFieldLeft.width/2);
+			textFieldLeft.y = 40;
 			textFieldLeft.textColor = 0xFFFFFF;
-			textFieldLeft.alpha=0;
-			
-			textFieldRight.x=ballRight.x-(textFieldRight.width/4);
-			textFieldRight.y=40;
+			textFieldLeft.alpha = 0;
+
+			textFieldRight.x=ballRight.x-(textFieldRight.width/2 + 2);
+			textFieldRight.y = 40;
 			textFieldRight.textColor = 0xFFFFFF;
-			textFieldRight.alpha=0;
-			
-			textFieldMenuCenter.x=0-(textFieldMenuCenter.width/2);
-			textFieldMenuCenter.y= -50;
+			textFieldRight.alpha = 0;
+
+			textFieldMenuCenter.x=0-(textFieldMenuCenter.width*2);
+			textFieldMenuCenter.y = -100;
 			textFieldMenuCenter.textColor = 0xFFFFFF;
-			textFieldMenuCenter.alpha=0;
-			
+			textFieldMenuCenter.alpha = 0;
+
 			var formatScreensaverTF = new TextFormat();//'Orator Std',26,0xDEDEDE);
-			formatScreensaverTF.size= 26;
-			formatScreensaverTF.font="Orator Std";
-			formatScreensaverTF.color=0xDEDEDE; 
+			formatScreensaverTF.size = 26;
+			formatScreensaverTF.font = "Orator Std";
+			formatScreensaverTF.color = 0xDEDEDE;
 			formatScreensaverTF.align = TextFormatAlign.CENTER;
 			
-			
+			var formatArticleTF = new TextFormat();
+			formatArticleTF.size = 26;
+			formatArticleTF.font = "Orator Std";
+			formatArticleTF.color = 0xDEDEDE;
+			formatArticleTF.align = TextFormatAlign.CENTER;
+
 			textFieldScreensaver.textColor = 0xFFFFFF;
 			textFieldScreensaver.autoSize = "left";
 			textFieldScreensaver.multiline = true;
 			textFieldScreensaver.defaultTextFormat = formatScreensaverTF;
-			textFieldScreensaver.alpha=0;
+			textFieldScreensaver.alpha = 0;
+			
+			textFieldArticle.textColor = 0xFFFFFF;
+			textFieldArticle.autoSize = "left";
+			textFieldArticle.multiline = true;
+			textFieldArticle.wordWrap = true;
+			textFieldArticle.width = 490;
+			//textFieldArticle.text = "Test test test test est tes tes tes tes tes tesetsetsets tset setsets et set";
+			textFieldArticle.x=10;
+			textFieldArticle.y=70;
+			textFieldArticle.defaultTextFormat=formatArticleTF;
+			textFieldArticle.alpha = 0;
 		}
-		
 
 
+		// == UTILITY FUNCTIONS =====================================================================
 
 		function valueMean(receivedValues:Array):Number
 		{
@@ -286,81 +306,82 @@
 			return Math.round(sum/arraySize);
 		}
 
-		function randomRange(minNum:Number, maxNum:Number):Number 
+		function randomRange(minNum:Number, maxNum:Number):Number
 		{
 			return (Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum);
 		}
 		
-		function onScreensaverVisibleFinish(event:TweenEvent):void 
+		// == STARTUP/SHUTDOWN FUNCTIONS =====================================================================
+
+		function onScreensaverVisibleFinish(event:TweenEvent):void
 		{
 			var tweenTxtScreensaverVisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,0,1,2,true);
 			tweenTxtScreensaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtVisibleFinalFinish);
 		}
 
-		function onTxtInvisibleFinish(event:TweenEvent):void 
+		function onTxtInvisibleFinish(event:TweenEvent):void
 		{
 			var tweenScreenSaverInvisible:Tween = new Tween(screensaver,"alpha",Strong.easeInOut,1,0,3,true);
 		}
-		
-		function onTxtVisibleFinish(event:TweenEvent):void 
+
+		function onTxtVisibleFinish(event:TweenEvent):void
 		{
 			var tweenTxtScreensaverInvisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,1,0,2,true);
 			tweenTxtScreensaverInvisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtInvisibleFinish);
 		}
-		
-		function onTxtVisibleFinalFinish(event:TweenEvent):void 
+
+		function onTxtVisibleFinalFinish(event:TweenEvent):void
 		{
 			var tweenTxtScreensaverInvisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,1,0,2,true);
 		}
 
-		function onTick(event:TimerEvent):void	
+		// == OnTick BUSINESS LOGIC =====================================================================
+
+		function onTick(event:TimerEvent):void
 		{
 			// calculate position
 			var valueLeft:Number;
 			var valueRight:Number;
 			var valueLight:Number;
-			var arrayLength = 15;  //TODO better outside of function
+			var arrayLength = 15;//TODO better outside of function
 
 			valueLeft = a.getAnalogData(3);
 			valueRight = a.getAnalogData(4);
 			valueLight = a.getAnalogData(5);
-			
 
-			if (magicMirrorOn == false && valueLight < lightSensorOnConstant) 
+
+			if (magicMirrorOn == false && valueLight < lightSensorOnConstant)
 			{
-				magicMirrorOn=true;
+				magicMirrorOn = true;
 				trace("MagicMirror turned on");
-				textFieldScreensaver.text=startupCompliments[randomRange(0,startupCompliments.length-1)];
+				textFieldScreensaver.text = startupCompliments[randomRange(0,startupCompliments.length - 1)];
 				textFieldScreensaver.x=0-(textFieldScreensaver.width/2);
 				textFieldScreensaver.y=0-(textFieldScreensaver.height/2);
 				var tweenTxtScreensaverVisible:Tween = new Tween(textFieldScreensaver,"alpha",Strong.easeInOut,0,1,2,true);
 				tweenTxtScreensaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onTxtVisibleFinish);
 			}
-			else if (magicMirrorOn == true && valueLight > lightSensorOffConstant) 
+			else if (magicMirrorOn == true && valueLight > lightSensorOffConstant)
 			{
-				magicMirrorOn=false;
+				magicMirrorOn = false;
 				trace("MagicMirror turned off");
-				textFieldScreensaver.text=goodbyeCompliments[randomRange(0,goodbyeCompliments.length-1)];
+				textFieldScreensaver.text = goodbyeCompliments[randomRange(0,goodbyeCompliments.length - 1)];
 				textFieldScreensaver.x=0-(textFieldScreensaver.width/2);
 				textFieldScreensaver.y=0-(textFieldScreensaver.height/2);
 				var tweenScreenSaverVisible:Tween = new Tween(screensaver,"alpha",Strong.easeInOut,0,1,2,true);
 				tweenScreenSaverVisible.addEventListener(TweenEvent.MOTION_FINISH, onScreensaverVisibleFinish);
 			}
-			
-			
-			
-						
-			if ((valueMean(receivedValuesRight) - valueMean(receivedValuesLeft)) > (menuContainer.x - 50 - ballRight.width)) 
+
+			if ((valueMean(receivedValuesRight) - valueMean(receivedValuesLeft)) > (menuContainer.x - 50 - ballRight.width))
 			{
-				ball.x = menuContainer.x-50-ballRight.width;
+				ball.x = menuContainer.x - 50 - ballRight.width;
 			}
-			else if ((valueMean(receivedValuesRight) - valueMean(receivedValuesLeft)) < (ballLeft.width + 50 - menuContainer.x)) 
+			else if ((valueMean(receivedValuesRight) - valueMean(receivedValuesLeft)) < (ballLeft.width + 50 - menuContainer.x))
 			{
-				ball.x=ballLeft.width+50-menuContainer.x; 
+				ball.x = ballLeft.width + 50 - menuContainer.x;
 			}
 			else
 			{
-			ball.x = (valueMean(receivedValuesRight) - valueMean(receivedValuesLeft));
+				ball.x = (valueMean(receivedValuesRight) - valueMean(receivedValuesLeft));
 			}
 			// Fill the Array with Values from the Sensor
 			receivedValuesLeft.unshift(valueLeft);
@@ -375,9 +396,9 @@
 			{
 				receivedValuesRight.pop();
 			}
-			
-			//trace("Value left: ", valueLeft, "Value right: ", valueRight);
-			trace("Countdown X/Y", countdown.x,"/",countdown.y," Countdown.alpha ", countdown.alpha," Countdown is on: ",countdownActivated, " Countdown finished: ", countdown.getTimerHasFinished(), " Countdown current: ", countdown.getCurrentTime());
+
+			trace("Value left: ", valueLeft, "Value right: ", valueRight, "Newsfeed alpha: ", newsfeed.alpha);
+			//trace("Countdown X/Y", countdown.x,"/",countdown.y," Countdown.alpha ", countdown.alpha," Countdown is on: ",countdownActivated, " Countdown finished: ", countdown.getTimerHasFinished(), " Countdown current: ", countdown.getCurrentTime());
 
 			time = new Date();//WHAT FOR? ??
 
@@ -388,13 +409,17 @@
 			}
 
 			//Go in if one of the two values is greater than 200
-			if ((valueRight>swipeTriggerSensorValue || valueLeft>swipeTriggerSensorValue) && menuActivated==false && menuInit==false)  //TODO outsource the 200 into a variable at the top
+			//TODO outsource the 200 into a variable at the top
+			if ((valueRight>swipeTriggerSensorValue || valueLeft>swipeTriggerSensorValue) && menuActivated==false && menuInit==false)
 			{
+				//trace
 				//Check if holDownTimer is not active
 				if (holdDownTimer==0)
 				{
+					trace();
 					//Check if it is from direction RIGHT
-					if (valueRight>200 && valueLeft<valueRight) // valueRight could be greater than 200, but valueLeft could be greater than 400 at the same time. Weird, I know
+					// valueRight could be greater than 200, but valueLeft could be greater than 400 at the same time. Weird, I know
+					if (valueRight>200 && valueLeft<valueRight)
 					{
 						fromDirection = "RIGHT";
 						trace("Incoming direction changed to RIGHT");
@@ -410,177 +435,216 @@
 					holdDownTimer = holdDownValue;
 				}
 			}
-			
-			
-			
-			if (volumeControl == true && playerIsOn == true) 
+
+
+
+			if (volumeControl == true && playerIsOn == true)
 			{
+
+				textBall.size = 15;
+				textBall.font = "Orator Std";
+				textBall.color = 0xFFFFFF;
+				textBall.align = TextFormatAlign.CENTER;
 				//TODO diese x-Werte statisch machen
 				shoutcastPlayer.adjustVolume(((ball.x+319.9)/639.8)+0.0);
-				//TODO string passt nicht in text field
-				textFieldMenuCenter.text="Move to Ball to adjust the Volume.\nRemove your hand from action area to accept Volume";
+				//TODO string passt nicht in text field;
+				textFieldMenuCenter.autoSize = "left"; 
+				textFieldMenuCenter.defaultTextFormat = textBall; 
+				textFieldMenuCenter.text = "Move to Ball to adjust the Volume.\nRemove your hand from action area to accept Volume";
 				if (textFieldMenuCenter.alpha < 1)
 				{
-					textFieldMenuCenter.alpha=textFieldMenuCenter.alpha+0.2;
+					textFieldMenuCenter.alpha = textFieldMenuCenter.alpha + 0.2;
 				}
 			}
 			else
 			{
 				if (textFieldMenuCenter.alpha >= 0)
 				{
-					textFieldMenuCenter.alpha=textFieldMenuCenter.alpha-0.2;
+					textFieldMenuCenter.alpha = textFieldMenuCenter.alpha - 0.2;
 				}
 			}
+
+			// == Making things (in)visible =====================================================================
 			
-			if (countdownActivated==true && countdown.alpha<1) 
+			if (countdownActivated==true && countdown.alpha<1)
 			{
-				countdown.alpha+=0.05;
+				countdown.alpha +=  0.05;
 			}
 			else if (countdown.getTimerHasFinished()==true && countdown.alpha>0)
 			{
-				countdown.alpha-=0.05;
-				countdownActivated=false;
+				countdown.alpha -=  0.05;
+				countdownActivated = false;
 			}
 			
-			
-			hitLeft= ball.hitTestObject(ballLeft);
-			hitRight= ball.hitTestObject(ballRight);
-			
-			if ((hitLeft == true || hitRight == true) && hitCurrentlyDetected == false && menuActivated == true && menuInit == true) 
+			if (readingArticle==true && newsfeed.alpha>0.1) 
 			{
-				hitCurrentlyDetected=true;
-				if (hitLeft == true) 
+				newsfeed.alpha-=0.05;
+				textFieldArticle.alpha+=0.05;
+			}
+			else if (readingArticle==false && newsfeed.alpha<1)
+			{
+				newsfeed.alpha+=0.05;
+				textFieldArticle.alpha-=0.05;
+			}
+
+			// == COLLISION DETECTION =====================================================================
+
+			hitLeft = ball.hitTestObject(ballLeft);
+			hitRight = ball.hitTestObject(ballRight);
+
+			if ((hitLeft == true || hitRight == true) && hitCurrentlyDetected == false && menuActivated == true && menuInit == true)
+			{
+				hitCurrentlyDetected = true;
+				if (hitLeft == true)
 				{
-					switch (currentlyDisplayed) 
+					switch (currentlyDisplayed)
 					{
-						case "mainScreen":
-						trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed);
-						if (countdownActivated==false)
-						{
-							countdown.startTimer();
-							countdownActivated=true;
-						}
-						
-						break;
-						
-						case "leftScreen":
-						trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed)
-						//Init read article
-						break;
-						
-						case "rightScreen":
-						trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed)
-						if (volumeControl == false) 
-						{
-							volumeControl=true;
-						}
-						break;
+						case "mainScreen" :
+							trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed);
+							if (countdownActivated==false)
+							{
+								countdown.startTimer();
+								countdownActivated = true;
+							}
+
+							break;
+
+						case "leftScreen" :
+							trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed);
+							if (readingArticle==false) 
+							{
+								readingArticle=true;
+								textFieldArticle.htmlText=newsfeed.getArticle();
+								//textFieldArticle.text=newsfeed.getArticle();
+							}
+							break;
+
+						case "rightScreen" :
+							trace("COLLISION LEFT DETECTED ON: ", currentlyDisplayed);
+							if (volumeControl == false)
+							{
+								volumeControl = true;
+							}
+							break;
 					}
 				}
 				else
 				{
-					switch (currentlyDisplayed) 
+					switch (currentlyDisplayed)
 					{
-						case "mainScreen":
-						trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed)
-						break;
-						
-						case "leftScreen":
-						trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed)
-						//Init next articles
-						break;
-						
-						case "rightScreen":
-						trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed)
-						if (playerIsOn == true && volumeControl == false) 
-						{
-							shoutcastPlayer.stopF();
-							playerIsOn=false;
-							//TODO hier ist der Fehler. Nächste Zeile auskommentieren dann gehts
-							//shoutcastPlayer = new ShoutcastPlayer();
-							textFieldRight.text="Start Radio";
-						}
-						else if (playerIsOn == false && volumeControl == false)
-						{
-							shoutcastPlayer.playF();
-							playerIsOn=true;
-							textFieldRight.text="Stop Radio";
-						}
-						break;
+						case "mainScreen" :
+							trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed);
+							break;
+
+						case "leftScreen" :
+							trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed);
+							//Init next articles
+							break;
+
+						case "rightScreen" :
+							trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed);
+							if (playerIsOn == true && volumeControl == false)
+							{
+								shoutcastPlayer.stopF();
+								playerIsOn = false;
+								//TODO hier ist der Fehler. Nächste Zeile auskommentieren dann gehts
+								//shoutcastPlayer = new ShoutcastPlayer();
+								textFieldRight.text = "Start Radio";
+							}
+							else if (playerIsOn == false && volumeControl == false)
+							{
+								shoutcastPlayer.playF();
+								playerIsOn = true;
+								textFieldRight.text = "Stop Radio";
+							}
+							break;
 					}
 				}
 			}
-			
-			if (hitLeft == false && hitRight == false) 
+
+			if (hitLeft == false && hitRight == false)
 			{
-				hitCurrentlyDetected=false;
+				hitCurrentlyDetected = false;
 			}
-			
-			if ((valueRight > menuStopSensorValueLower && valueRight < menuStopSensorValueUpper) && (valueLeft > menuStopSensorValueLower && valueLeft < menuStopSensorValueUpper)) 
+
+			if ((valueRight > menuStopSensorValueLower && valueRight < menuStopSensorValueUpper) && (valueLeft > menuStopSensorValueLower && valueLeft < menuStopSensorValueUpper))
 			{
-				menuActivated=false;
+				menuActivated = false;
 				if (volumeControl == true)
 				{
-					volumeControl=false;
+					volumeControl = false;
 				}
 			}
-			
-			if ((valueRight > menuStartSensorValueLower && valueRight < menuStartSensorValueUpper) && (valueLeft > menuStartSensorValueLower && valueLeft < menuStartSensorValueUpper)) 
+
+			if ((valueRight > menuStartSensorValueLower && valueRight < menuStartSensorValueUpper) && (valueLeft > menuStartSensorValueLower && valueLeft < menuStartSensorValueUpper))
 			{
-				
+
 				//trace("MirrorMain", "onTick", "both values are in correct range for Menu start");
-				if (menuInit == true) 
+				if (menuInit == true)
 				{
-					switch (currentlyDisplayed) 
+
+					textStart.size = 15;
+					textStart.font = "Orator Std";
+					textStart.color = 0xFFFFFF;
+
+					textFieldLeft.defaultTextFormat = textStart;
+					textFieldRight.defaultTextFormat = textStart;
+					textFieldLeft.width = 200;
+					textFieldRight.width = 200;
+
+					switch (currentlyDisplayed)
 					{
-						case "mainScreen":
-						trace("DO SOMETHIG HERE");
-						textFieldLeft.text="Start the timer";
-						textFieldRight.text="";
-						break;
-						
-						case "leftScreen":
-						trace("DO SOMETHIG HERE");
-						textFieldLeft.text="Read articles";
-						textFieldRight.text="Next articles";
-						break;
-						
-						case "rightScreen":
-						textFieldLeft.text="Adjust Volume";
-						if (playerIsOn == false)
-						{
-							textFieldRight.text="Start Radio";
-						}
-						else
-						{
-							textFieldRight.text="Stop Radio";
-						}
-						break;
+
+						case "mainScreen" :
+							trace("DO SOMETHIG HERE");
+
+							textFieldLeft.text = "Start timer";
+
+							textFieldRight.text = "";
+							break;
+
+						case "leftScreen" :
+							trace("DO SOMETHIG HERE");
+							textFieldLeft.text = "Read articles";
+							textFieldRight.text = "Next articles";
+							break;
+
+						case "rightScreen" :
+							textFieldLeft.text = "Adjust Volume";
+							if (playerIsOn == false)
+							{
+								textFieldRight.text = "Start Radio";
+							}
+							else
+							{
+								textFieldRight.text = "Stop Radio";
+							}
+							break;
 					}
-					if (alphaThreshhold >= 3) 
+					if (alphaThreshhold >= 3)
 					{
-						if (ball.alpha < 1) 
+						if (ball.alpha < 1)
 						{
 							ball.alpha = ball.alpha + 0.1;
-							ballLeft.alpha=ballLeft.alpha+0.1;
+							ballLeft.alpha = ballLeft.alpha + 0.1;
 							ballRight.alpha=ballRight.alpha+0.1
-														
-							textFieldLeft.alpha=textFieldLeft.alpha+0.1
-							textFieldRight.alpha = textFieldRight.alpha + 0.1
+							;
+							textFieldLeft.alpha = textFieldLeft.alpha + 0.1;
+							textFieldRight.alpha = textFieldRight.alpha + 0.1;
 							/*if (currentlyDisplayed == "mainScreen")// && countdown.alpha<1)
 							{
-								countdown.alpha += 0.1;
-							}*/			
+							countdown.alpha += 0.1;
+							}*/
 						}
-						else 
+						else
 						{
 							menuActivated = true;
 						}
 					}
-					else 
+					else
 					{
 						alphaThreshhold++;
-					}	
+					}
 				}
 				else
 				{
@@ -588,26 +652,26 @@
 					trace("MirrorMain","onTick","menuInit = true");
 				}
 			}
-			else 
+			else
 			{
-				if (alphaThreshhold > 0) 
+				if (alphaThreshhold > 0)
 				{
-					alphaThreshhold--
+					alphaThreshhold--;
 				}
-				else 
+				else
 				{
-					if (menuActivated == false) 
+					if (menuActivated == false)
 					{
-						if (ball.alpha > 0) 
+						if (ball.alpha > 0)
 						{
 							ball.alpha = ball.alpha - 0.1;
-							ballLeft.alpha=ballLeft.alpha-0.1;
-							ballRight.alpha=ballRight.alpha-0.1;
-							textFieldLeft.alpha=textFieldLeft.alpha-0.1
-							textFieldRight.alpha = textFieldRight.alpha - 0.1
+							ballLeft.alpha = ballLeft.alpha - 0.1;
+							ballRight.alpha = ballRight.alpha - 0.1;
+							textFieldLeft.alpha = textFieldLeft.alpha - 0.1;
+							textFieldRight.alpha = textFieldRight.alpha - 0.1;
 							if (currentlyDisplayed != "mainScreen")// && countdown.alpha > 0)
 							{
-									countdown.alpha -= 0.1;
+								countdown.alpha -=  0.1;
 							}
 						}
 						else
@@ -617,15 +681,15 @@
 					}
 					/*
 					if (ball.alpha <= 0) {
-						menuActivated  = false;
+					menuActivated  = false;
 					} else if (ball.alpha < 2) {
-						ball.alpha = ball.alpha - 0.05;
+					ball.alpha = ball.alpha - 0.05;
 					}*/
-					
-					
+
+
 				}
 			}
-			
+
 			// set the light on pin13 to HIGH (1) when the analogValue is higher than 512
 			// otherwise to LOW (0) when the analogValue is below 512
 
@@ -649,15 +713,15 @@
 		//also this function is not really necessary, right?
 		function timerStart(e:TimerEvent):void
 		{
-				trace("Timer start");
-			}
+			trace("Timer start");
+		}
 
 		function timerStop(e:TimerEvent):void
 		{
 			trace("Timer stop");
 			//iteration should not be greater than length of receivedValues, ideally one lesser
 			var iteration:Number;
-			
+
 			//just important if the function gets called immediately after the programm starts
 			if (receivedValuesLeft.length < 15 || receivedValuesRight.length < 15)
 			{
@@ -674,13 +738,13 @@
 			{
 				iteration = 15;
 			}
-			
+
 			//Iterate over the receivedValues
 			for (var i:Number=0; i<iteration; i++)
 			{
 				trace(receivedValuesLeft[i], receivedValuesRight[i]);
 
-				if (receivedValuesLeft[i] > 200 && fromDirection == "RIGHT" && receivedValuesRight[i] < 200 )
+				if (receivedValuesLeft[i] > 200 && fromDirection == "RIGHT" && receivedValuesRight[i] < 200)
 				{
 					trace(currentlyDisplayed);
 
@@ -689,31 +753,31 @@
 					//var tweenContainerRightToLeft:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x - 900,2,true);
 					trace("Swipe from ", fromDirection, "to LEFT detected");
 					//really it goes RIGHT
-					switch (currentlyDisplayed) 
+					switch (currentlyDisplayed)
 					{
-						case "mainScreen": 
-						//tweenContainerMainToLeft.start();
-						//tweenContainerRightToLeft.start();
-						var tweenContainerMainBackToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
-						var tweenContainerRightToLeft:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x - 900,1,true);
-						currentlyDisplayed="rightScreen";
-						indicatorRightInside.alpha=0;
-						indicatorMiddleInside.alpha=1;
-						indicatorLeftInside.alpha=1;
-						break;
-						
-						case "leftScreen":
-						var tweenContainerMainToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
-						var tweenContainerLeftToLeft:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x - 900,1,true);
-						currentlyDisplayed="mainScreen";
-						indicatorRightInside.alpha=1;
-						indicatorMiddleInside.alpha=0;
-						indicatorLeftInside.alpha=1;
-						break;
-						
-						case "rightScreen":
-						var tweenContainerRightEnd:Tween= new Tween (rightScreen, "x", Elastic.easeOut, rightScreen.x, rightScreen.x,1,true);
-						break;
+						case "mainScreen" :
+							//tweenContainerMainToLeft.start();
+							//tweenContainerRightToLeft.start();
+							var tweenContainerMainBackToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
+							var tweenContainerRightToLeft:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x - 900,1,true);
+							currentlyDisplayed = "rightScreen";
+							indicatorRightInside.alpha = 0;
+							indicatorMiddleInside.alpha = 1;
+							indicatorLeftInside.alpha = 1;
+							break;
+
+						case "leftScreen" :
+							var tweenContainerMainToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
+							var tweenContainerLeftToLeft:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x - 900,1,true);
+							currentlyDisplayed = "mainScreen";
+							indicatorRightInside.alpha = 1;
+							indicatorMiddleInside.alpha = 0;
+							indicatorLeftInside.alpha = 1;
+							break;
+
+						case "rightScreen" :
+							var tweenContainerRightEnd:Tween = new Tween(rightScreen,"x",Elastic.easeOut,rightScreen.x,rightScreen.x,1,true);
+							break;
 					}
 					break;
 				}
@@ -725,34 +789,34 @@
 					trace(currentlyDisplayed);
 					trace("Swipe from ", fromDirection, "to RIGHT detected");
 					//really it goes LEFT
-					switch (currentlyDisplayed) 
+					switch (currentlyDisplayed)
 					{
-						case "mainScreen":
-						var tweenContainerMainBackToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
-						var tweenContainerLeftToRight:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x + 900,1,true);
-						currentlyDisplayed="leftScreen";
-						indicatorRightInside.alpha=1;
-						indicatorMiddleInside.alpha=1;
-						indicatorLeftInside.alpha=0;
-						break;
-						
-						case "rightScreen":
-						var tweenContainerMainToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
-						var tweenContainerRightToRight:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x + 900,1,true);
-						currentlyDisplayed="mainScreen";
-						indicatorRightInside.alpha=1;
-						indicatorMiddleInside.alpha=0;
-						indicatorLeftInside.alpha=1;
-						break;
-						
-						case "leftScreen":
-						break;
+						case "mainScreen" :
+							var tweenContainerMainBackToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
+							var tweenContainerLeftToRight:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x + 900,1,true);
+							currentlyDisplayed = "leftScreen";
+							indicatorRightInside.alpha = 1;
+							indicatorMiddleInside.alpha = 1;
+							indicatorLeftInside.alpha = 0;
+							break;
+
+						case "rightScreen" :
+							var tweenContainerMainToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
+							var tweenContainerRightToRight:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x + 900,1,true);
+							currentlyDisplayed = "mainScreen";
+							indicatorRightInside.alpha = 1;
+							indicatorMiddleInside.alpha = 0;
+							indicatorLeftInside.alpha = 1;
+							break;
+
+						case "leftScreen" :
+							break;
 					}
 					break;
 				}
 			}
 		}
-		
+
 		//ARDUINO STUFF
 		// == SETUP AND INITIALIZE CONNECTION ( don't modify ) ==================================
 
@@ -821,5 +885,7 @@
 			// start the timer that calls the onTick function
 			refreshTimer.start();
 		}
-	}//class
-}//package
+	}
+	//class;
+}
+//package

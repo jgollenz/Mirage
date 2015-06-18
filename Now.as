@@ -106,7 +106,7 @@
 					case 4 :
 						daySpelled = "Thursday";
 						break;
-					
+
 					case 5 :
 						daySpelled = "Friday";
 						break;
@@ -119,53 +119,53 @@
 						daySpelled = "Sunday";
 						break;
 				}
-				
+
 				switch (now.month)
 				{
 					case 0 :
 						monthSpelled = "january";
 						break;
-					
+
 					case 1 :
 						monthSpelled = "february";
 						break;
-					
+
 					case 2 :
 						monthSpelled = "march";
 						break;
-					
+
 					case 3 :
 						monthSpelled = "april";
 						break;
-					
+
 					case 4 :
 						monthSpelled = "may";
 						break;
-					
+
 					case 5 :
 						monthSpelled = "june";
 						break;
-					
+
 					case 6 :
 						monthSpelled = "july";
 						break;
-					
+
 					case 7 :
 						monthSpelled = "august";
 						break;
-					
+
 					case 8 :
 						monthSpelled = "september";
 						break;
-					
+
 					case 9 :
 						monthSpelled = "october";
 						break;
-					
+
 					case 10 :
 						monthSpelled = "november";
 						break;
-					
+
 					case 11 :
 						monthSpelled = "december";
 						break;
@@ -173,14 +173,14 @@
 
 				year = now.fullYear;
 				dayOfMonth = now.date;
-				
+
 				if (dayOfMonth<10)
 				{
-					fullDayOfMonth="0"+dayOfMonth;
+					fullDayOfMonth = "0" + dayOfMonth;
 				}
 				else
 				{
-					fullDayOfMonth=dayOfMonth;
+					fullDayOfMonth = dayOfMonth;
 				}
 				/*
 				switch (dayOfMonth)
@@ -236,7 +236,7 @@
 
 		private function showTime()
 		{
-			textFormatHoursAndMinutes.size = 57;
+			textFormatHoursAndMinutes.size = 40;
 			textFormatHoursAndMinutes.align = TextFormatAlign.CENTER;
 			textFormatHoursAndMinutes.font = "Orator Std";
 			textFormatHoursAndMinutes.color = "0xFFFFFF";
@@ -246,20 +246,20 @@
 			textFormatSeconds.font = "Orator Std";
 			textFormatSeconds.color = "0xFFFFFF";
 
-			textFormatWeekdayAndDate.size = 35;
+			textFormatWeekdayAndDate.size = 20;
 			textFormatWeekdayAndDate.align = TextFormatAlign.CENTER;
-			textFormatWeekdayAndDate.font = "Segoe UI";
+			textFormatWeekdayAndDate.font = "Orator Std";
 			textFormatWeekdayAndDate.color = "0xFFFFFF";
-			
-			;
+
+
 			tfHoursAndMinutes.defaultTextFormat = textFormatHoursAndMinutes;
 			//tfHoursAndMinutes.embedFonts = true;
 			//tfHoursAndMinutes.antiAliasType = AntiAliasType.ADVANCED;
 			trace(now.hours,now.minutes,now.seconds);
 			tfHoursAndMinutes.text = this.hours + ":" + this.minutes;
 			//tfHoursAndMinutes.textColor = 0xFFFFFF;
-			tfHoursAndMinutes.x = 300;
-			tfHoursAndMinutes.y = 40;
+			tfHoursAndMinutes.x = 370;
+			tfHoursAndMinutes.y = 30;
 			tfHoursAndMinutes.autoSize = "left";
 			tfHoursAndMinutes.multiline = true;
 			//tfHoursAndMinutes.width = 300;
@@ -268,22 +268,22 @@
 			tfSeconds.defaultTextFormat = textFormatSeconds;
 			tfSeconds.text = this.seconds;
 			tfSeconds.x = tfHoursAndMinutes.x + tfHoursAndMinutes.width;
-			tfSeconds.y = tfHoursAndMinutes.y + 15;
+			tfSeconds.y = tfHoursAndMinutes.y + 10;
 			tfSeconds.autoSize = "left";
 			tfSeconds.multiline = true;
 
 			tfWeekday.defaultTextFormat = textFormatWeekdayAndDate;
-			tfWeekday.text = this.daySpelled+" "+this.day;// +" "+ this.monthSpelled;
+			tfWeekday.text = this.daySpelled + " " + this.day;// +" "+ this.monthSpelled;
 			tfWeekday.autoSize = "left";
 			tfWeekday.multiline = true;
 			tfWeekday.x = tfHoursAndMinutes.x;
-			tfWeekday.y = tfHoursAndMinutes.y + tfHoursAndMinutes.height + 5;
+			tfWeekday.y = 90;
 
 			tfDate.defaultTextFormat = textFormatWeekdayAndDate;
 			tfDate.text = this.dayOfMonth + ". " + this.monthSpelled + " " + this.year;
 			tfDate.autoSize = "left";
 			tfDate.multiline = true;
-			tfDate.x = tfHoursAndMinutes.x;
+			tfDate.x = tfHoursAndMinutes.x - 10;
 			tfDate.y = tfWeekday.y + tfWeekday.height + 5;
 
 			//tfHoursAndMinutes.text = this.daySpelled +", "+this.dayOfMonth+"."+this.month+"."+this.year+"\n"+this.hours + ":" + this.minutes + ":" + this.seconds;
