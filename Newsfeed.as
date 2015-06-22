@@ -53,18 +53,49 @@
 			_rssLoader.load(_rssURL);
 		}
 
-		public function getArticle():String 
+		public function getArticle(index:Number):String 
 		{
-			return this.article1;
+			switch (index)
+			{
+				case 1:
+					return this.article1;
+					break;
+				case 2: 
+					return this.article2;
+					break;
+				case 3: 
+					return this.article3;
+					break;
+				default:
+					return this.article1;
+			}
 		}
 		
-		private function link00Loaded(e:Event):void
+		private function linkLoaded(e:Event):void
 		{
 			//trace("THIS SHOULD BE HTML TEXT: "+link00Loader.data);
-			article1=link00Loader.data;
+			/*article1=link00Loader.data;
 			matchedArticle= patternHtmlCopyText.exec(article1);
 			trace("THIS SHOULD BE MATCHED HTML: ", matchedArticle)
-			article1=matchedArticle.toString();
+			article1 = matchedArticle.toString();*/
+			switch (e.target) 
+			{
+				case link00Loader:
+					article1 = link00Loader.data;
+					matchedArticle = patternHtmlCopyText.exec(article1);
+					article1 = matchedArticle.toString();
+					break;
+				case link01Loader:
+					article2= link01Loader.data;
+					matchedArticle = patternHtmlCopyText.exec(article2);
+					article2 = matchedArticle.toString();
+					break;
+				case link02Loader:
+					article3 = link02Loader.data;
+					matchedArticle = patternHtmlCopyText.exec(article3);
+					article3 = matchedArticle.toString();
+					break;
+			}
 		}
 		
 		public function rssLoaded(evt:Event):void
@@ -73,14 +104,14 @@
 			//trace(_rssXML);
 			
 			var link00:URLRequest = new URLRequest(_rssXML.channel.item[0].link);
-			link00Loader.addEventListener(Event.COMPLETE, link00Loaded);
+			link00Loader.addEventListener(Event.COMPLETE, linkLoaded);
 			link00Loader.load(link00);
 			var link01:URLRequest = new URLRequest(_rssXML.channel.item[1].link);
+			link01Loader.addEventListener(Event.COMPLETE, linkLoaded);
 			link01Loader.load(link01);
 			var link02:URLRequest = new URLRequest(_rssXML.channel.item[2].link);
+			link02Loader.addEventListener(Event.COMPLETE, linkLoaded);
 			link02Loader.load(link02);
-			
-			
 			
 			headlineFormat.size = 20;
 			headlineFormat.font = "Orator Std";

@@ -14,7 +14,6 @@
 		public var lessonsRaw:Array = new Array();
 		public var lessons:Array = new Array();
 		var now:Now;
-		var schedulerWidget:SchedulerWidget;
 		public var callingClass:Object;
 
 
@@ -51,21 +50,21 @@
 				lessonsRaw.push(result);
 				var matchedUniqueID:Object = patternUniqueID.exec(result.toString());
 				var matchedLesson:Object = patternLesson.exec(result.toString());
-				var newLesson:Lesson = new Lesson(matchedLesson[1],matchedLesson[2],matchedLesson[3],matchedLesson[4],matchedLesson[5],matchedLesson[6] + " " + matchedLesson[7], matchedUniqueID[1]);
-				var uniqueIDalreadyTaken:Boolean=false;
+				var newLesson:Lesson = new Lesson(matchedLesson[1],matchedLesson[2],matchedLesson[3],matchedLesson[4],matchedLesson[5],matchedLesson[6] + " " + matchedLesson[7],matchedUniqueID[1]);
+				var uniqueIDalreadyTaken:Boolean = false;
 				trace("Scheduler ","Lessons length",lessons.length);
-				for (var i:int=0; i<lessons.length; i++) 
+				for (var i:int=0; i<lessons.length; i++)
 				{
-					if (lessons[i].getUniqueID==matchedUniqueID)
+					if (lessons[i].getUniqueID == matchedUniqueID)
 					{
-						uniqueIDalreadyTaken=true;
+						uniqueIDalreadyTaken = true;
 					}
 				}
-				if (uniqueIDalreadyTaken==false) 
+				if (uniqueIDalreadyTaken==false)
 				{
 					lessons.push(newLesson);
 				}
-				
+
 				result = patternRaw.exec(preloader.response[0]);
 			}
 
@@ -74,13 +73,20 @@
 			var champagne = new Champagne();
 			var textFormat:TextFormat = new TextFormat();
 			var textField:TextField = new TextField();
+			var headline:TextField = new TextField();
+			var headlineFormat:TextFormat = new TextFormat();
 
+			headlineFormat.size = 40;
+			headlineFormat.align = TextFormatAlign.CENTER;
+			headlineFormat.font = "Orator Std";
+			headline.defaultTextFormat = headlineFormat;
+			headline.antiAliasType = AntiAliasType.ADVANCED;
+			headline.text = "Timetable";
 
 			textFormat.size = 17;
 			textFormat.align = TextFormatAlign.CENTER;
-			textFormat.font = champagne.fontName;
+			textFormat.font = "Orator Std";
 			textField.defaultTextFormat = textFormat;
-			textField.embedFonts = true;
 			textField.antiAliasType = AntiAliasType.ADVANCED;
 
 			//textField.setTextFormat(textFormat);
@@ -90,17 +96,26 @@
 			{
 				textField.text = textField.text + lessons[i].toString();
 			}
-			if (lessons.length==0)
+			if (lessons.length == 0)
 			{
-				textField.text = "No lessons today\nAWESOME!!!"
+				textField.text = "No lessons today\nAWESOME!!!";
 			}
 
 			textField.textColor = 0xFFFFFF;
 			textField.x = 10;
-			textField.y = 70;
+			textField.y = 80;
 			textField.width = 515;
 			textField.height = 800;
+			
+			headline.textColor = 0xFFFFFF;
+			headline.x = 10;
+			headline.y = 20;
+			headline.width = 515;
+			headline.height = 200;
+			
+			
 			addChild(textField);
+			addChild(headline); 
 		}
 
 	}

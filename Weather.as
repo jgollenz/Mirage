@@ -80,20 +80,20 @@
 			var codeDay4:String = _xmlData.channel.item.yweather::forecast[4]. @ code;
 			var _weatherToday:MovieClip = new MovieClip();
 
-			
-			var sizeOfNextDays:Number = 14;		//How large the next days are displayed
-			
-			var widthNextDays:Number = 100;			//width of the NextDay TextFields
-			var widthNextDaysMinMax:Number = 50;	//width of the NextDayMin and NextDayMax TextFields
-			
-			var xNextDays:Number = 10;		//First column ... which day
-			var xNextDaysMin:Number = 100;	//Second column ... min degrees
-			var xNextDaysMax:Number = 155;	//Third column ... max degrees
-			
-			var yNextDay1:Number = 220;		//First row	... first day
-			var yNextDay2:Number = 240;		//Second row ... second day
-			var yNextDay3:Number=260;		//Third row ... third day
-			var yNextDay4:Number=280;		//Fourth row ... fourth day
+
+			var sizeOfNextDays:Number = 14;//How large the next days are displayed
+
+			var widthNextDays:Number = 100;//width of the NextDay TextFields
+			var widthNextDaysMinMax:Number = 50;//width of the NextDayMin and NextDayMax TextFields
+
+			var xNextDays:Number = 10;//First column ... which day
+			var xNextDaysMin:Number = 100;//Second column ... min degrees
+			var xNextDaysMax:Number = 155;//Third column ... max degrees
+
+			var yNextDay1:Number = 220;//First row... first day
+			var yNextDay2:Number = 240;//Second row ... second day
+			var yNextDay3:Number = 260;//Third row ... third day
+			var yNextDay4:Number = 280;//Fourth row ... fourth day
 
 			textFormat.size = sizeOfNextDays;
 			textFormat.font = "Orator Std";
@@ -105,7 +105,7 @@
 
 			textToday.size = 20;
 			textToday.font = "Orator Std";
-			textToday.color = "0xFFFFFF"
+			textToday.color = "0xFFFFFF";
 
 
 			state.defaultTextFormat = textHeadline;
@@ -363,7 +363,7 @@
 				case "41" :
 				case "43" :
 					var weather06:weather06 = new Weather06();
-					_weatherToday.addChild(weather05);
+					_weatherToday.addChild(weather06);
 					break;
 
 				case "3" :
@@ -372,6 +372,19 @@
 				case "39" :
 					var weather10:weather10 = new Weather10();
 					_weatherToday.addChild(weather10);
+					break;
+
+				case "27" :
+				case "29" :
+					var weather07:weather07 = new Weather07();
+					_weatherToday.addChild(weather07);
+					break;
+
+				case "20" :
+				case "21" :
+				case "22" :
+					var weather08:weather08 = new Weather08();
+					_weatherToday.addChild(weather08);
 					break;
 			}
 		}

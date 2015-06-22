@@ -21,6 +21,7 @@
 	import flash.text.TextField;
 	import flash.text.TextFormatAlign;
 	import flash.text.AntiAliasType;
+	import flash.media.SoundChannel;
 
 	public class MirrorMain extends MovieClip
 	{
@@ -63,6 +64,8 @@
 		var newsfeed:Newsfeed = new Newsfeed();
 		var _rssLoader:URLLoader = new URLLoader();
 		var _rssURL:URLRequest = new URLRequest("http://derStandard.at/?page=rss&ressort=Seite1");
+		var swoosh:Swoosh = new Swoosh();
+		var sndChannel:SoundChannel = new SoundChannel();
 
 		/*
 		TODO timer for the onTick() function.
@@ -93,6 +96,7 @@
 		var lightSensorOnConstant:Number = 550;//The lower the brighter
 		var lightSensorOffConstant:Number = 890;//The higher the darker
 
+		var currentArticle = 1;
 
 		//Arrays for received Sensor-Data
 		var receivedValuesLeft:Array = new Array();
@@ -103,13 +107,16 @@
 		"Good morning Beautiful!", 
 		"Good morning Handsome!",
 		"My dear, you are the \nfairest in the land",
+		"You look beautiful today ;)",
 		"You look gorgeous today ;)",
 		"You look awesome today ;)", 
+		"Good morning! Yeaaaaah!",
 		"How come you hair never looks bad?",
 		"Do you always look that\n good after you wake up?",
 		"Hi Beautiful!",
 		"Hi Handsome!",
-		"Good morning, I see the \n Assassins have failed"
+		"Good morning, I see the \n Assassins have failed",
+		"Good morning, I see the \n Assassins have failed\n\nagain!"
 		);
 		var startupQuotes:Array = new Array 
 		(
@@ -168,6 +175,7 @@
 		{
 			// Refresh the clock
 			stage.addEventListener(Event.ENTER_FRAME, now.getTime);
+			stage.addEventListener(Event.ENTER_FRAME, shoutcastPlayer.onEnterFrame);
 			refreshTimer.addEventListener(TimerEvent.TIMER, onTick);
 			weather.loadXML("http://weather.yahooapis.com/forecastrss?w=548536&u=c");
 			addEventListener(Event.ADDED_TO_STAGE, countdown.init);
@@ -268,7 +276,7 @@
 			formatScreensaverTF.align = TextFormatAlign.CENTER;
 			
 			var formatArticleTF = new TextFormat();
-			formatArticleTF.size = 26;
+			formatArticleTF.size = 22;
 			formatArticleTF.font = "Orator Std";
 			formatArticleTF.color = 0xDEDEDE;
 			formatArticleTF.align = TextFormatAlign.CENTER;
@@ -284,9 +292,9 @@
 			textFieldArticle.multiline = true;
 			textFieldArticle.wordWrap = true;
 			textFieldArticle.width = 490;
-			//textFieldArticle.text = "Test test test test est tes tes tes tes tes tesetsetsets tset setsets et set";
+			textFieldArticle.height= 900;
 			textFieldArticle.x=10;
-			textFieldArticle.y=70;
+			textFieldArticle.y=32;
 			textFieldArticle.defaultTextFormat=formatArticleTF;
 			textFieldArticle.alpha = 0;
 		}
@@ -410,7 +418,7 @@
 
 			//Go in if one of the two values is greater than 200
 			//TODO outsource the 200 into a variable at the top
-			if ((valueRight>swipeTriggerSensorValue || valueLeft>swipeTriggerSensorValue) && menuActivated==false && menuInit==false)
+			if ((valueRight>swipeTriggerSensorValue || valueLeft>swipeTriggerSensorValue) && menuActivated==false && menuInit==false && readingArticle==false)
 			{
 				//trace
 				//Check if holDownTimer is not active
@@ -514,8 +522,11 @@
 							if (readingArticle==false) 
 							{
 								readingArticle=true;
-								textFieldArticle.htmlText=newsfeed.getArticle();
-								//textFieldArticle.text=newsfeed.getArticle();
+								textFieldArticle.htmlText=newsfeed.getArticle(currentArticle);
+							}
+							else 
+							{
+								readingArticle = false;
 							}
 							break;
 
@@ -539,6 +550,14 @@
 						case "leftScreen" :
 							trace("COLLISION RIGHT DETECTED ON: ", currentlyDisplayed);
 							//Init next articles
+							if (readingArticle == true) {
+								currentArticle+= 1;
+								if (currentArticle > 3)
+								{
+									currentArticle-= 3;
+								}
+								textFieldArticle.htmlText=newsfeed.getArticle(currentArticle);
+							}
 							break;
 
 						case "rightScreen" :
@@ -555,6 +574,7 @@
 							{
 								shoutcastPlayer.playF();
 								playerIsOn = true;
+								trace("PLAYER IS ON: ",playerIsOn);
 								textFieldRight.text = "Stop Radio";
 							}
 							break;
@@ -605,8 +625,15 @@
 
 						case "leftScreen" :
 							trace("DO SOMETHIG HERE");
-							textFieldLeft.text = "Read articles";
-							textFieldRight.text = "Next articles";
+							if (readingArticle==false)
+							{
+								textFieldLeft.text = "Read articles";
+							}
+							else
+							{
+								textFieldLeft.text = "Return";
+							}
+							textFieldRight.text = "Next article";
 							break;
 
 						case "rightScreen" :
@@ -760,6 +787,7 @@
 							//tweenContainerRightToLeft.start();
 							var tweenContainerMainBackToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
 							var tweenContainerRightToLeft:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x - 900,1,true);
+							sndChannel=swoosh.play();
 							currentlyDisplayed = "rightScreen";
 							indicatorRightInside.alpha = 0;
 							indicatorMiddleInside.alpha = 1;
@@ -769,6 +797,7 @@
 						case "leftScreen" :
 							var tweenContainerMainToLeft:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x - 900,1,true);
 							var tweenContainerLeftToLeft:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x - 900,1,true);
+							sndChannel=swoosh.play();
 							currentlyDisplayed = "mainScreen";
 							indicatorRightInside.alpha = 1;
 							indicatorMiddleInside.alpha = 0;
@@ -794,6 +823,7 @@
 						case "mainScreen" :
 							var tweenContainerMainBackToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
 							var tweenContainerLeftToRight:Tween = new Tween(leftScreen,"x",Strong.easeInOut,leftScreen.x,leftScreen.x + 900,1,true);
+							sndChannel=swoosh.play();
 							currentlyDisplayed = "leftScreen";
 							indicatorRightInside.alpha = 1;
 							indicatorMiddleInside.alpha = 1;
@@ -803,6 +833,7 @@
 						case "rightScreen" :
 							var tweenContainerMainToRight:Tween = new Tween(mainScreen,"x",Strong.easeInOut,mainScreen.x,mainScreen.x + 900,1,true);
 							var tweenContainerRightToRight:Tween = new Tween(rightScreen,"x",Strong.easeInOut,rightScreen.x,rightScreen.x + 900,1,true);
+							sndChannel=swoosh.play();
 							currentlyDisplayed = "mainScreen";
 							indicatorRightInside.alpha = 1;
 							indicatorMiddleInside.alpha = 0;
