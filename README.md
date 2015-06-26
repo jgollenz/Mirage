@@ -7,10 +7,10 @@ Advanced version of a "MagicMirror" for AS3 and Arduino
 This project emerged from another project I had to do at my university.
 Together with a colleague I had to make something with Arduino-sensors and Flash AS3.
 
-Inspired by Michael Teeuw's "MagicMirror" (http://michaelteeuw.nl/tagged/magicmirror), I wanted to build one myself.
+Inspired by ![Michael Teeuw's "MagicMirror"](http://michaelteeuw.nl/tagged/magicmirror), I wanted to build one myself.
 Great, but we still needed to use some sensors, it was a requirement for the project.
 So I thought about how to make a touchscreen out of it. Until I read Michael's blog and how he said he didn't want smears
-on a mirror. He is right. But what if you never even touch your screen to interact with it.
+on a mirror. I agree. But what if you never even touch your screen to interact with it.
 We are now using two sharp proximity sensors to track our hand(s) in front of the screen. 
 The goal is to recognize (swipe-)gestures so that users can interact with the Mirage. 
 
