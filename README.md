@@ -1,7 +1,7 @@
 # Mirage
 Advanced version of a "MagicMirror" for AS3 and Arduino
 
-![Alt text]https://raw.githubusercontent.com/jgollenz/mirage/master/pictures/Main-Screen_2.JPG
+
 ![My image](jgollenz.github.com/mirage/pictures/Main-Screen_2.JPG)
 
 This project emerged from another project I had to do at my university.
