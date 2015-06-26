@@ -2,7 +2,7 @@
 Advanced version of a "MagicMirror" for AS3 and Arduino
 
 
-![alt tag](https://i.imgur.com/DGzSZ8h.png)
+![alt tag](https://github.com/jgollenz/Mirage/blob/master/Pictures/Main-Screen_2.JPG)
 
 This project emerged from another project I had to do at my university.
 Together with a colleague I had to make something with Arduino-sensors and Flash AS3.
